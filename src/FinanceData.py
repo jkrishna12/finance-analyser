@@ -174,7 +174,17 @@ test_stock = FinanceData('AAPL')
 
 print(test_stock.ticker)
 
+print("Balance sheet")
 test_stock.get_balance_sheet_df()
 
 print(test_stock.balance_sheet_df.head())
 
+print("Income statement")
+test_stock.get_income_statement_df()
+
+print(test_stock.income_statement_df.head())
+
+print("Cashflow statement")
+test_stock.get_cashflow_statement_df()
+
+print(test_stock.cashflow_statement_df.head())
