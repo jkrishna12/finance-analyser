@@ -1,6 +1,7 @@
 import requests
 import os
 import pandas as pd
+from utils import *
 from dotenv import load_dotenv 
 
 class FinanceData:
@@ -13,6 +14,7 @@ class FinanceData:
         self.ticker = self.set_ticker(ticker)
         self.balance_sheet_api = None
         self.balance_sheet_df = None
+        self.transpose_balance_sheet_df = None
         self.income_statement_api = None
         self.income_statement_df = None
         self.cashflow_statement_api = None
@@ -85,7 +87,31 @@ class FinanceData:
         self.get_balance_sheet_api()
 
         # assigns pandas dataframe to balance_sheet_df
-        self.balance_sheet_df = pd.json_normalize(self.balance_sheet_api)
+        # values are sorted in ascending order of date
+        self.balance_sheet_df = pd.json_normalize(self.balance_sheet_api).sort_values("date", ascending=True).reset_index(drop = True)
+
+        return
+
+    def transpose_balance_sheet(self):
+        """
+        Transposes the balance sheet data attribute (dataframe) of the object.
+
+        Args:
+
+        Returns:
+            pd.DataFrame: The transposed dataframe.
+
+        Raises:
+            AttributeError: If the specified attribute is not a dataframe.
+            ValueError: If the specified attribute name is invalid.
+        """
+        if not isinstance(self.balance_sheet_df, pd.DataFrame):
+            raise AttributeError(f"balance_sheet_df is not a dataframe attribute.")
+
+        # if attribute_name not in ['balance_sheet_df', 'income_statement_df', 'cashflow_statement_df']:
+        #     raise ValueError(f"Invalid attribute name for transpose: {attribute_name}")
+
+        self.transpose_balance_sheet_df = transpose_df(self.balance_sheet_df)
 
         return
 
@@ -166,25 +192,51 @@ class FinanceData:
         self.cashflow_statement_df = pd.json_normalize(self.cashflow_statement_api)
         return
 
-    def hello(self):
-        self.greeting = 'hello'
-        return self.greeting
     
 test_stock = FinanceData('AAPL')
 
 print(test_stock.ticker)
 
 print("Balance sheet")
+print("Get balance sheet")
 test_stock.get_balance_sheet_df()
-
 print(test_stock.balance_sheet_df.head())
+test_stock.transpose_balance_sheet()
+print("Transpose balance sheet")
+print(test_stock.transpose_balance_sheet_df.head())
 
-print("Income statement")
-test_stock.get_income_statement_df()
 
-print(test_stock.income_statement_df.head())
 
-print("Cashflow statement")
-test_stock.get_cashflow_statement_df()
+# print("Income statement")
+# test_stock.get_income_statement_df()
 
-print(test_stock.cashflow_statement_df.head())
+# print(test_stock.income_statement_df.head())
+
+# print("Cashflow statement")
+# test_stock.get_cashflow_statement_df()
+
+# print(test_stock.cashflow_statement_df.head())
+
+def transpose(self, attribute_name):
+    """
+    Transposes the specified data attribute (dataframe) of the object.
+
+    Args:
+        attribute_name (str): Name of the dataframe attribute to transpose.
+            Must be one of 'balance_sheet_df', 'income_statement_df', or 'cashflow_statement_df'.
+
+    Returns:
+        pd.DataFrame: The transposed dataframe.
+
+    Raises:
+        AttributeError: If the specified attribute is not a dataframe.
+        ValueError: If the specified attribute name is invalid.
+    """
+
+    if not hasattr(self, attribute_name) or not isinstance(getattr(self, attribute_name), pd.DataFrame):
+        raise AttributeError(f"{attribute_name} is not a dataframe attribute.")
+
+    if attribute_name not in ['balance_sheet_df', 'income_statement_df', 'cashflow_statement_df']:
+        raise ValueError(f"Invalid attribute name for transpose: {attribute_name}")
+
+    return getattr(self, attribute_name).T  # Access the dataframe and transpose it
