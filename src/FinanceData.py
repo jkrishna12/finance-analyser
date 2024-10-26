@@ -12,14 +12,21 @@ class FinanceData:
 
         # initialise relevant attributes
         self.ticker = self.set_ticker(ticker)
+
+        # Balance sheet attributes
         self.balance_sheet_api = None
         self.balance_sheet_df = None
         self.transpose_balance_sheet_df = None
+
+        # Income statement atttributes
         self.income_statement_api = None
         self.income_statement_df = None
         self.transpose_income_statement_df = None
+
+        # Cashflow statement attributes
         self.cashflow_statement_api = None
         self.cashflow_statement_df = None
+        self.transpose_cashflow_statement_df = None
 
     def set_ticker(self, ticker):
         """
@@ -211,7 +218,27 @@ class FinanceData:
 
         # assigns pandas dataframe to cashflow_statement_df
         self.cashflow_statement_df = json_to_df(self.cashflow_statement_api)
+
+        return
+    
+    def transpose_cashflow_statement(self):
+        """
+        Transposes the cashflow statement data attribute (dataframe) of the object.
+
+        Args:
+
+        Returns:
+            pd.DataFrame: The transposed dataframe.
+
+        Raises:
+            AttributeError: If the specified attribute is not a dataframe.
+            ValueError: If the specified attribute name is invalid.
+        """
+        if not isinstance(self.cashflow_statement_df, pd.DataFrame):
+            raise AttributeError(f"cashflow_statement_df is not a dataframe attribute.")
         
+        self.transpose_cashflow_statement_df = transpose_df(self.cashflow_statement_df)
+
         return
 
     
@@ -219,13 +246,13 @@ test_stock = FinanceData('AAPL')
 
 print(test_stock.ticker)
 
-print("Income Statement")
-print("Get Income Statement")
-test_stock.get_income_statement_df()
-print(test_stock.income_statement_df.head())
-test_stock.transpose_income_statement()
-print("Transpose income statement")
-print(test_stock.transpose_income_statement_df.head())
+print("Cashflow Statement")
+print("Get cashflow Statement")
+test_stock.get_cashflow_statement_df()
+print(test_stock.cashflow_statement_df.head())
+test_stock.transpose_cashflow_statement()
+print("Transpose cashflow statement")
+print(test_stock.transpose_cashflow_statement_df.head())
 
 
 
