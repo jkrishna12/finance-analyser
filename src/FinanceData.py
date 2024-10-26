@@ -17,6 +17,7 @@ class FinanceData:
         self.transpose_balance_sheet_df = None
         self.income_statement_api = None
         self.income_statement_df = None
+        self.transpose_income_statement_df = None
         self.cashflow_statement_api = None
         self.cashflow_statement_df = None
 
@@ -88,7 +89,7 @@ class FinanceData:
 
         # assigns pandas dataframe to balance_sheet_df
         # values are sorted in ascending order of date
-        self.balance_sheet_df = pd.json_normalize(self.balance_sheet_api).sort_values("date", ascending=True).reset_index(drop = True)
+        self.balance_sheet_df = json_to_df(self.balance_sheet_api)
 
         return
 
@@ -148,7 +149,27 @@ class FinanceData:
         self.get_income_statement_api()
 
         # assigns pandas dataframe to income_statement_df
-        self.income_statement_df = pd.json_normalize(self.income_statement_api)
+        self.income_statement_df = json_to_df(self.income_statement_api)
+
+        return
+    
+    def transpose_income_statement(self):
+        """
+        Transposes the balance sheet data attribute (dataframe) of the object.
+
+        Args:
+
+        Returns:
+            pd.DataFrame: The transposed dataframe.
+
+        Raises:
+            AttributeError: If the specified attribute is not a dataframe.
+            ValueError: If the specified attribute name is invalid.
+        """
+        if not isinstance(self.income_statement_df, pd.DataFrame):
+            raise AttributeError(f"income_statement_df is not a dataframe attribute.")
+        
+        self.transpose_income_statement_df = transpose_df(self.income_statement_df)
 
         return
 
@@ -189,7 +210,8 @@ class FinanceData:
         self.get_cashflow_statement_api()
 
         # assigns pandas dataframe to cashflow_statement_df
-        self.cashflow_statement_df = pd.json_normalize(self.cashflow_statement_api)
+        self.cashflow_statement_df = json_to_df(self.cashflow_statement_api)
+        
         return
 
     
@@ -197,13 +219,13 @@ test_stock = FinanceData('AAPL')
 
 print(test_stock.ticker)
 
-print("Balance sheet")
-print("Get balance sheet")
-test_stock.get_balance_sheet_df()
-print(test_stock.balance_sheet_df.head())
-test_stock.transpose_balance_sheet()
-print("Transpose balance sheet")
-print(test_stock.transpose_balance_sheet_df.head())
+print("Income Statement")
+print("Get Income Statement")
+test_stock.get_income_statement_df()
+print(test_stock.income_statement_df.head())
+test_stock.transpose_income_statement()
+print("Transpose income statement")
+print(test_stock.transpose_income_statement_df.head())
 
 
 
