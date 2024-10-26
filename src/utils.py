@@ -1,3 +1,5 @@
+import streamlit as st
+
 def transpose_df(df):
     """
     Function takes in a pandas dataframe and returns a transposed dataframe with calendar year set as column names
